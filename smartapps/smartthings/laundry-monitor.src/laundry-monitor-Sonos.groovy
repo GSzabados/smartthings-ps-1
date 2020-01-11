@@ -20,9 +20,9 @@
  */
 
 definition(
-	name: "Laundry Monitor",
-	namespace: "smartthings",
-	author: "SmartThings",
+	name: "Laundry Monitor - Sonos",
+	namespace: "gszabados",
+	author: "SmartThings, updated Gabor Szabados",
 	description: "Sends a message and (optionally) turns on or blinks a light to indicate that laundry is done.",
 	category: "Convenience",
 	iconUrl: "https://s3.amazonaws.com/smartapp-icons/FunAndSocial/App-HotTubTuner.png",
@@ -37,6 +37,17 @@ preferences {
         input("recipients", "contact", title: "Send notifications to") {
             input "phone", "phone", title: "Phone Number", required: false
         }
+	section ("Send this message") {
+    	input "message", "text", title: "Notification message", description: "Laudry is done!", required: true
+  	}
+	section (title: "Notification method") {
+    	input "sendPushMessage", "bool", title: "Send a push notification?"
+    	input "speechOut", "capability.speechSynthesis", title:"Speak Via: (Speech Synthesis)",multiple: true, required: false
+    	input "player", "capability.musicPlayer", title:"Speak Via: (Music Player -> TTS)",multiple: true, required: false
+    	input "sonos", "capability.audioNotification", title:"Speak Via: (Sonos -> TTS)",multiple: true, required: false
+    	input "volume", "number", title: "Temporarily change volume", description: "0-100%", required: true 
+    	input "phone", "phone", title: "Send a text message to:", required: false
+  	}
 	}
 	section("And by turning on these lights (optional)") {
 		input "switches", "capability.switch", required: false, multiple: true, title: "Which lights?"
@@ -127,7 +138,9 @@ def checkRunning() {
                         sendNotificationToContacts(msg, recipients)
                     }
                     else {
-
+			if(speechOut){speakMessage(message)}
+    			if(player){musicPlayerTTS(message)}
+    			if(sonos){audioNotificationTTS(message)}
                         if (phone) {
                             sendSms phone, msg
                         } else {
@@ -203,4 +216,17 @@ private flashLights() {
 			delay += offFor
 		}
 	}
+}
+
+private speakMessage(msg) {
+speechOut.speak(msg)
+}
+
+private musicPlayerTTS(msg) {
+	player.playText(msg)
+}
+
+private audioNotificationTTS(msg) {
+	state.sound = textToSpeech(msg instanceof List ? msg[0] : msg) // not sure why this is (sometimes) needed)
+    sonos.playTrackAndResume(state.sound.uri, volume)
 }
