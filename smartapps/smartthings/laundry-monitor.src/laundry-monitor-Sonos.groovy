@@ -48,7 +48,7 @@ preferences {
     	input "volume", "number", title: "Temporarily change volume", description: "0-100%", required: true 
     	input "phone", "phone", title: "Send a text message to:", required: false
   	}
-	}
+	
 	section("And by turning on these lights (optional)") {
 		input "switches", "capability.switch", required: false, multiple: true, title: "Which lights?"
 		input "lightMode", "enum", options: ["Flash Lights", "Turn On Lights"], required: false, defaultValue: "Turn On Lights", title: "Action?"
