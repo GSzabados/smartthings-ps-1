@@ -36,6 +36,7 @@ preferences {
 	section("Via this number (optional, sends push notification if not specified)"){
         input("recipients", "contact", title: "Send notifications to") {
             input "phone", "phone", title: "Phone Number", required: false
+            }
         }
 	section ("Send this message") {
     	input "message", "text", title: "Notification message", description: "Laudry is done!", required: true
